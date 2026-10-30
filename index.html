@@ -254,7 +254,7 @@ footer a:hover{color:var(--fg)}
 <section class="hero">
   <div class="grid-bg"></div>
   <div class="wrap" style="position:relative">
-    <div class="pill rv"><b>v1.0.4</b>Nově: macOS pro Apple Silicon</div>
+    <div class="pill rv"><b data-rel="ver">v1.0.4</b>Nově: macOS pro Apple Silicon</div>
     <h1 class="rv">Poker tracker, který <em>rozumí českým hernám</em></h1>
     <p class="lead rv">Xtraction načte tvoje handy z Fortuny a Synottipu, spočítá přes 60 statistik a během hry ti ukáže HUD nad soupeři. Všechno na tvém počítači.</p>
     <div class="hero-cta rv">
@@ -405,27 +405,27 @@ footer a:hover{color:var(--fg)}
     <div class="sec-head rv">
       <span class="eyebrow">Stáhnout</span>
       <h2>Xtraction pro tvůj počítač</h2>
-      <p class="lead">Verze 1.0.4 · vydáno 30. 10. 2026</p>
+      <p class="lead" id="relInfo">Verze 1.0.4 · vydáno 30. 10. 2026</p>
     </div>
     <div class="platforms">
       <div class="plat rv" id="plat-win">
         <div class="plat-top"><svg><use href="#win"/></svg><span class="tag">Tvůj systém</span></div>
         <div><h3>Windows</h3><p class="req">Windows 10 nebo 11, 64bit</p></div>
-        <a class="btn btn-primary btn-lg" data-dl="win" href="https://github.com/XtractionCo/xtractionco.github.io/releases/download/v1.0.4/PokerXtract-Setup-1.0.4.exe"><svg><use href="#dl"/></svg>Stáhnout pro Windows</a>
-        <dl><dt>Soubor</dt><dd>PokerXtract-Setup-1.0.4.exe</dd><dt>Velikost</dt><dd>118 MB</dd></dl>
-        <button class="hash" data-hash="7f681d21c331972fc4ed433c20353dd6fef67607624114efe7bc4fe7b234f63a" title="Zkopírovat SHA-256"><span>SHA-256</span><code>7f681d21…7b234f63a</code><svg><use href="#copy"/></svg></button>
+        <a class="btn btn-primary btn-lg" data-dl="win" href="https://github.com/XtractionCo/XtractionUpdates/releases/latest/download/Xtraction-Setup-x64.exe"><svg><use href="#dl"/></svg>Stáhnout pro Windows</a>
+        <dl><dt>Soubor</dt><dd>Xtraction-Setup-x64.exe</dd><dt>Velikost</dt><dd data-size="win">118 MB</dd></dl>
+        <button class="hash" data-asset="Xtraction-Setup-x64.exe" data-hash="7f681d21c331972fc4ed433c20353dd6fef67607624114efe7bc4fe7b234f63a" title="Zkopírovat SHA-256"><span>SHA-256</span><code>7f681d21…7b234f63a</code><svg><use href="#copy"/></svg></button>
         <p class="note">Pokud Windows zobrazí „Systém Windows ochránil počítač“, klikni na <b>Další informace → Přesto spustit</b>.</p>
       </div>
       <div class="plat rv" id="plat-mac">
         <div class="plat-top"><svg><use href="#apple"/></svg><span class="tag">Tvůj systém</span></div>
         <div><h3>macOS</h3><p class="req">Apple Silicon (M1 a novější)</p></div>
-        <a class="btn btn-primary btn-lg" data-dl="mac" href="https://github.com/XtractionCo/xtractionco.github.io/releases/download/v1.0.4/PokerXtract-1.0.4-mac-arm64.dmg"><svg><use href="#dl"/></svg>Stáhnout pro Mac</a>
-        <dl><dt>Soubor</dt><dd>PokerXtract-1.0.4-mac-arm64.dmg</dd><dt>Velikost</dt><dd>466 MB</dd></dl>
-        <button class="hash" data-hash="fcc5c969e9f31690e5a40e594f15de7a5ff0145be4b2f0b2808a33b15ad2f86f" title="Zkopírovat SHA-256"><span>SHA-256</span><code>fcc5c969…3a5b2e</code><svg><use href="#copy"/></svg></button>
+        <a class="btn btn-primary btn-lg" data-dl="mac" href="https://github.com/XtractionCo/XtractionUpdates/releases/latest/download/Xtraction-mac-arm64.dmg"><svg><use href="#dl"/></svg>Stáhnout pro Mac</a>
+        <dl><dt>Soubor</dt><dd>Xtraction-mac-arm64.dmg</dd><dt>Velikost</dt><dd data-size="mac">466 MB</dd></dl>
+        <button class="hash" data-asset="Xtraction-mac-arm64.dmg" data-hash="fcc5c969e9f31690e5a40e594f15de7a5ff0145be4b2f0b2808a33b15ad2f86f" title="Zkopírovat SHA-256"><span>SHA-256</span><code>fcc5c969…2ad2f86f</code><svg><use href="#copy"/></svg></button>
         <p class="note">Otevři DMG a přetáhni aplikaci do <b>Aplikací</b>. Při prvním spuštění klikni pravým tlačítkem → <b>Otevřít</b>.</p>
       </div>
     </div>
-    <p class="dl-foot rv">Mac s procesorem Intel zatím nepodporujeme. Starší verze najdeš na <a href="https://github.com/XtractionCo/xtractionco.github.io/releases">GitHubu</a>.</p>
+    <p class="dl-foot rv">Mac s procesorem Intel zatím nepodporujeme. Starší verze najdeš na <a href="https://github.com/XtractionCo/XtractionUpdates/releases">GitHubu</a>.</p>
   </div>
 </section>
 
@@ -511,8 +511,30 @@ footer a:hover{color:var(--fg)}
       b.href=link.href;
       b.querySelector('span').textContent=os==='mac'?'Stáhnout pro Mac':'Stáhnout pro Windows';
     });
-    document.getElementById('heroMeta').innerHTML='v1.0.4 · '+(os==='mac'?'Apple Silicon · 466 MB':'Windows 10/11 · 118 MB')+' · <a href="#stahnout">Jiné platformy</a>';
   }
+  var setMeta=function(){
+    if(!os)return;
+    var ver=document.querySelector('[data-rel="ver"]').textContent, size=document.querySelector('[data-size="'+os+'"]').textContent;
+    document.getElementById('heroMeta').innerHTML=ver+' · '+(os==='mac'?'Apple Silicon':'Windows 10/11')+' · '+size+' · <a href="#stahnout">Jiné platformy</a>';
+  };
+  setMeta();
+
+  // fill version, size and SHA-256 from the latest GitHub release (static values stay as fallback)
+  fetch('https://api.github.com/repos/XtractionCo/XtractionUpdates/releases/latest').then(function(r){return r.ok?r.json():Promise.reject()}).then(function(rel){
+    var byName={};(rel.assets||[]).forEach(function(a){byName[a.name]=a});
+    var win=byName['Xtraction-Setup-x64.exe'],mac=byName['Xtraction-mac-arm64.dmg'];
+    if(!win||!mac)return;
+    var ver=rel.tag_name.replace(/^v?/,'v'), mb=function(a){return Math.round(a.size/1048576)+' MB'};
+    document.querySelector('[data-rel="ver"]').textContent=ver;
+    document.getElementById('relInfo').textContent='Verze '+ver.slice(1)+' · vydáno '+new Date(win.updated_at).toLocaleDateString('cs-CZ');
+    document.querySelector('[data-size="win"]').textContent=mb(win);
+    document.querySelector('[data-size="mac"]').textContent=mb(mac);
+    document.querySelectorAll('.hash[data-asset]').forEach(function(h){
+      var d=(byName[h.dataset.asset].digest||'').replace(/^sha256:/,'');
+      if(d){h.dataset.hash=d;h.querySelector('code').textContent=d.slice(0,8)+'…'+d.slice(-8)}
+    });
+    setMeta();
+  }).catch(function(){});
 
   // reveal on scroll
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
