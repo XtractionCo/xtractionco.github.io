@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xtraction — poker tracker pro Fortunu a Synottip</title>
+<meta name="description" content="Xtraction je desktopový poker tracker a HUD pro Fortunu a Synottip. Import hand historie, 60+ statistik, živý HUD, replayer a grafy. Ke stažení pro Windows a macOS.">
+<meta property="og:title" content="Xtraction — poker tracker pro Fortunu a Synottip">
+<meta property="og:description" content="Importuj handy, sleduj 60+ statistik a hraj s živým HUDem. Windows a macOS.">
+<meta property="og:image" content="assets/hero-hud.jpg">
+<meta name="theme-color" content="#0d1210">
+<link rel="icon" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0f0d; --bg-2:#101613; --card:#131a17; --card-2:#18201c;
+  --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.12);
+  --fg:#ecf2ee; --muted:#93a19a; --dim:#5f6d66;
+  --brand:#f97316; --brand-2:#fb923c; --brand-glow:rgba(249,115,22,.35);
+  --blue:#6ea8fe; --green:#5fd38d; --yellow:#f5c84c; --red:#f2696b;
+  --radius:16px; --max:1160px;
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand-2)}
+h1,h2,h3{letter-spacing:-.025em;line-height:1.1;font-weight:600}
+h2{font-size:clamp(30px,4.2vw,46px)}
+.lead{color:var(--muted);font-size:18px;max-width:620px}
+section{padding:120px 0;position:relative}
+.sec-head{display:grid;gap:16px;margin-bottom:56px;max-width:720px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 22px;border-radius:12px;font-weight:500;font-size:15px;transition:transform .15s,background .2s,box-shadow .2s,border-color .2s;white-space:nowrap;cursor:pointer;border:0}
+.btn svg{width:18px;height:18px;flex:none}
+.btn-primary{background:var(--brand);color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 10px 30px -8px var(--brand-glow)}
+.btn-primary:hover{background:#ff8126;transform:translateY(-1px);box-shadow:0 0 0 1px rgba(255,255,255,.18) inset,0 14px 40px -8px var(--brand-glow)}
+.btn-ghost{background:rgba(255,255,255,.04);border:1px solid var(--line-2);color:var(--fg)}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+.btn-lg{height:56px;padding:0 28px;font-size:16px;border-radius:14px}
+
+/* nav */
+.nav{position:fixed;inset:0 0 auto;z-index:50;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+.nav.scrolled{background:rgba(11,15,13,.78);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border-color:var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:600;font-size:18px;letter-spacing:-.02em}
+.logo svg{width:26px;height:26px}
+.nav-links{display:flex;gap:32px;font-size:14px;color:var(--muted)}
+.nav-links a:hover{color:var(--fg)}
+.nav .btn{height:38px;padding:0 16px;font-size:14px;border-radius:10px}
+
+/* hero */
+.hero{padding:160px 0 80px;text-align:center;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:-200px 0 auto;height:900px;background:radial-gradient(600px 380px at 50% 30%,rgba(249,115,22,.18),transparent 70%),radial-gradient(900px 500px at 50% 0%,rgba(95,211,141,.06),transparent 70%);pointer-events:none}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 70% 55% at 50% 20%,#000 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse 70% 55% at 50% 20%,#000 30%,transparent 75%);pointer-events:none;opacity:.6}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--line-2);font-size:13px;color:var(--muted);margin-bottom:28px}
+.pill b{background:rgba(249,115,22,.15);color:var(--brand-2);font-weight:500;padding:2px 10px;border-radius:999px;font-family:var(--mono);font-size:12px}
+.hero h1{font-size:clamp(40px,7vw,80px);max-width:900px;margin:0 auto;font-weight:600;letter-spacing:-.04em}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,#ffb066,var(--brand) 60%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lead{margin:24px auto 0;font-size:19px}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:40px}
+.hero-meta{margin-top:18px;font-size:13px;color:var(--dim);font-family:var(--mono)}
+.hero-meta a{color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+
+/* product shot */
+.shot{position:relative;margin:80px auto 0;max-width:1080px;perspective:2000px}
+.window{border-radius:14px;background:#0e1311;border:1px solid var(--line-2);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 40px 120px -20px rgba(0,0,0,.8),0 0 120px -30px var(--brand-glow);overflow:hidden;transform:rotateX(8deg);transform-origin:center top;transition:transform 1s cubic-bezier(.2,.8,.2,1)}
+.window.flat{transform:none}
+.titlebar{display:flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-bottom:1px solid var(--line);background:#111815}
+.titlebar i{width:11px;height:11px;border-radius:50%;background:#2a332f}
+.titlebar span{margin-left:12px;font-size:12px;color:var(--dim);font-family:var(--mono)}
+.window img{width:100%;height:auto}
+.float{position:absolute;background:rgba(19,26,23,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;text-align:left;box-shadow:0 20px 50px -10px rgba(0,0,0,.7);font-family:var(--mono);font-size:12px;animation:bob 6s ease-in-out infinite}
+.float .k{color:var(--dim);letter-spacing:.08em;font-size:10px;text-transform:uppercase}
+.float .v{font-size:22px;font-weight:500;letter-spacing:-.02em;font-family:var(--sans)}
+.float.f1{left:-40px;top:22%}
+.float.f2{right:-36px;top:48%;animation-delay:-3s}
+.hudrow{display:flex;gap:14px}
+.hudrow div{display:grid}
+@keyframes bob{50%{transform:translateY(-10px)}}
+
+/* rooms strip */
+.rooms{padding:56px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-2)}
+.rooms .wrap{display:flex;align-items:center;justify-content:center;gap:56px;flex-wrap:wrap;color:var(--muted)}
+.rooms p{font-size:13px;color:var(--dim);font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.room{font-size:22px;font-weight:600;letter-spacing:-.02em;color:#c9d3ce;display:flex;align-items:center;gap:10px}
+.room small{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--dim);border:1px solid var(--line-2);border-radius:6px;padding:2px 6px}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.card{background:linear-gradient(180deg,var(--card-2),var(--card));border:1px solid var(--line);border-radius:var(--radius);padding:28px;position:relative;overflow:hidden;transition:border-color .3s}
+.card:hover{border-color:var(--line-2)}
+.card h3{font-size:20px;margin-bottom:8px}
+.card p{color:var(--muted);font-size:15px}
+.card .ico{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;background:rgba(249,115,22,.12);color:var(--brand-2);margin-bottom:20px;border:1px solid rgba(249,115,22,.2)}
+.card .ico svg{width:20px;height:20px}
+.c-4{grid-column:span 4}.c-2{grid-column:span 2}.c-3{grid-column:span 3}
+.statlist{margin-top:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.statlist div{background:#0f1512;padding:14px 16px;font-family:var(--mono)}
+.statlist .k{font-size:10.5px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+.statlist .v{font-size:22px;font-family:var(--sans);font-weight:500;letter-spacing:-.02em}
+.b{color:var(--blue)}.g{color:var(--green)}.y{color:var(--yellow)}.r{color:var(--red)}
+.chart{margin-top:24px;height:130px}
+.chart path.line{fill:none;stroke:var(--brand);stroke-width:2.2;stroke-dasharray:900;stroke-dashoffset:900}
+.chart path.ev{fill:none;stroke:var(--green);stroke-width:1.6;stroke-dasharray:4 5;opacity:.7}
+.in .chart path.line{animation:draw 2.4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.cards-row{display:flex;gap:8px;margin-top:22px}
+.pc{width:44px;height:60px;border-radius:7px;background:#f4f1ea;color:#111;font-weight:600;display:grid;place-items:center;font-size:18px;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.pc.red{color:#d43c3c}
+.pc.back{background:repeating-linear-gradient(45deg,#c2410c 0 6px,#ea580c 6px 12px);border:3px solid #f4f1ea}
+.timeline{display:flex;gap:6px;margin-top:16px;font-family:var(--mono);font-size:11px}
+.timeline span{padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.05);color:var(--muted)}
+.timeline span.on{background:rgba(249,115,22,.15);color:var(--brand-2)}
+
+/* showcase */
+.showcase{display:grid;grid-template-columns:1fr 1.25fr;gap:64px;align-items:center}
+.checks{list-style:none;display:grid;gap:14px;margin-top:28px}
+.checks li{display:flex;gap:12px;color:var(--muted)}
+.checks li b{color:var(--fg);font-weight:500}
+.checks svg{flex:none;width:20px;height:20px;color:var(--brand);margin-top:3px}
+.tabs{display:flex;gap:4px;padding:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;width:max-content;margin-bottom:16px}
+.tabs button{all:unset;cursor:pointer;padding:8px 14px;border-radius:8px;font-size:13px;color:var(--muted)}
+.tabs button[aria-selected=true]{background:var(--card-2);color:var(--fg);box-shadow:0 0 0 1px var(--line-2) inset}
+.showcase .window{transform:none}
+.showcase .window img{transition:opacity .35s}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:s}
+.step{padding:28px;border-radius:var(--radius);border:1px solid var(--line);background:var(--bg-2);position:relative}
+.step::before{counter-increment:s;content:"0" counter(s);font-family:var(--mono);font-size:12px;color:var(--brand-2);display:block;margin-bottom:40px}
+.step h3{font-size:19px;margin-bottom:8px}
+.step p{color:var(--muted);font-size:15px}
+
+/* download */
+.dl{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden}
+.dl::before{content:"";position:absolute;inset:auto 0 -300px;height:600px;background:radial-gradient(600px 300px at 50% 50%,rgba(249,115,22,.14),transparent 70%);pointer-events:none}
+.dl .sec-head{margin-left:auto;margin-right:auto;text-align:center;justify-items:center}
+.platforms{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:920px;margin:0 auto;position:relative}
+.plat{padding:32px;border-radius:20px;border:1px solid var(--line-2);background:linear-gradient(180deg,#151d19,#111815);display:flex;flex-direction:column;gap:20px;transition:border-color .3s,box-shadow .3s}
+.plat.detected{border-color:rgba(249,115,22,.5);box-shadow:0 0 0 4px rgba(249,115,22,.08),0 30px 80px -30px var(--brand-glow)}
+.plat-top{display:flex;align-items:center;justify-content:space-between}
+.plat-top svg{width:34px;height:34px;color:var(--fg)}
+.tag{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:999px;background:rgba(249,115,22,.14);color:var(--brand-2);opacity:0}
+.plat.detected .tag{opacity:1}
+.plat h3{font-size:24px}
+.plat .req{color:var(--muted);font-size:14px}
+.plat dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:13px;font-family:var(--mono);color:var(--dim);border-top:1px solid var(--line);padding-top:18px}
+.plat dd{color:var(--muted);text-align:right}
+.plat .btn{justify-content:center;width:100%}
+.hash{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--dim);background:#0c110f;border:1px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;transition:color .2s}
+.hash:hover{color:var(--muted)}
+.hash code{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.hash svg{width:14px;height:14px;flex:none}
+.note{font-size:13px;color:var(--dim);line-height:1.5}
+.note b{color:var(--muted);font-weight:500}
+.dl-foot{text-align:center;margin-top:36px;font-size:14px;color:var(--dim)}
+.dl-foot a{color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+
+/* pricing */
+.prices{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:920px}
+.price{padding:32px;border-radius:20px;border:1px solid var(--line);background:var(--card)}
+.price.pro{border-color:rgba(249,115,22,.4);background:linear-gradient(180deg,rgba(249,115,22,.08),var(--card) 40%)}
+.price h3{font-size:22px;display:flex;align-items:center;gap:10px}
+.price h3 span{font-family:var(--mono);font-size:11px;font-weight:400;padding:3px 9px;border-radius:999px;background:var(--brand);color:#fff}
+.price .amt{font-size:15px;color:var(--muted);margin:8px 0 24px}
+.price ul{list-style:none;display:grid;gap:12px;font-size:15px;color:var(--muted)}
+.price li{display:flex;gap:10px}
+.price li svg{width:18px;height:18px;flex:none;margin-top:3px;color:var(--green)}
+.price .btn{margin-top:28px;width:100%;justify-content:center}
+
+/* faq */
+.faq{max-width:780px}
+details{border-bottom:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;padding:22px 0;font-size:17px;font-weight:500;display:flex;justify-content:space-between;gap:16px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--mono);color:var(--dim);font-size:20px;transition:transform .25s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{color:var(--muted);padding:0 0 22px;max-width:680px}
+
+/* cta + footer */
+.final{text-align:center}
+.final h2{font-size:clamp(34px,5vw,58px);max-width:760px;margin:0 auto 20px}
+.final .lead{margin:0 auto 36px}
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--dim);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
+footer nav{display:flex;gap:24px}
+footer a:hover{color:var(--fg)}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.2,.8,.2,1),transform .8s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+.hero .rv{opacity:1;transform:none;transition:none;animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+.hero .rv:nth-child(3){animation-delay:.06s}.hero .rv:nth-child(4){animation-delay:.12s}.hero .rv:nth-child(5){animation-delay:.18s}.hero .rv:nth-child(6){animation-delay:.22s}.hero .shot{animation-delay:.3s}
+@keyframes rise{from{opacity:0;transform:translateY(20px)}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:#1c2521;border:1px solid var(--line-2);padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;transition:.3s;pointer-events:none;z-index:60}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.chart path.line{stroke-dashoffset:0}}
+@media (max-width:960px){
+  .nav-links{display:none}
+  .bento{grid-template-columns:1fr 1fr}
+  .c-4,.c-3{grid-column:span 2}.c-2{grid-column:span 1}
+  .showcase{grid-template-columns:1fr;gap:40px}
+  .float{display:none}
+}
+@media (max-width:720px){
+  section{padding:84px 0}
+  .wrap{padding:0 16px}
+  .hero{padding:128px 0 56px}
+  .bento,.steps,.platforms,.prices{grid-template-columns:1fr}
+  .c-4,.c-3,.c-2{grid-column:auto}
+  .statlist{grid-template-columns:repeat(2,1fr)}
+  .rooms .wrap{gap:28px}
+  .window{transform:none}
+  .tabs{width:100%;overflow-x:auto}
+  .hero-cta .btn{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="logo" viewBox="0 0 30 30"><rect x="2" y="1" width="12" height="9" rx="2.6" fill="#f97316"/><rect x="14" y="10.5" width="13" height="9" rx="2.6" fill="#f97316"/><rect x="2" y="20" width="12" height="9" rx="2.6" fill="#f97316"/></symbol>
+  <symbol id="win" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5.5 10 4.5v7H3zM11 4.4 21 3v8.5H11zM3 12.5h7v7l-7-1zM11 12.5h10V21l-10-1.4z"/></symbol>
+  <symbol id="apple" viewBox="0 0 24 24"><path fill="currentColor" d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.3 1.2 9.7.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.3 1.3-2.7 1.3-2.7s-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.6 2.8-1.4z"/></symbol>
+  <symbol id="dl" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 20h14"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></g></symbol>
+</svg>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a href="#" class="logo"><svg><use href="#logo"/></svg>Xtraction</a>
+    <nav class="nav-links">
+      <a href="#funkce">Funkce</a>
+      <a href="#hud">HUD</a>
+      <a href="#cenik">Ceník</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a href="#stahnout" class="btn btn-primary"><svg><use href="#dl"/></svg>Stáhnout</a>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="grid-bg"></div>
+  <div class="wrap" style="position:relative">
+    <div class="pill rv"><b>v1.0.4</b>Nově: macOS pro Apple Silicon</div>
+    <h1 class="rv">Poker tracker, který <em>rozumí českým hernám</em></h1>
+    <p class="lead rv">Xtraction načte tvoje handy z Fortuny a Synottipu, spočítá přes 60 statistik a během hry ti ukáže HUD nad soupeři. Všechno na tvém počítači.</p>
+    <div class="hero-cta rv">
+      <a href="#stahnout" class="btn btn-primary btn-lg" id="heroBtn"><svg><use href="#dl"/></svg><span>Stáhnout zdarma</span></a>
+      <a href="#funkce" class="btn btn-ghost btn-lg">Prohlédnout funkce</a>
+    </div>
+    <p class="hero-meta rv" id="heroMeta">Windows 10/11 · macOS Apple Silicon</p>
+
+    <div class="shot rv">
+      <div class="window" id="heroWindow">
+        <div class="titlebar"><i></i><i></i><i></i><span>Xtraction — Hero HUD</span></div>
+        <img src="assets/hero-hud.jpg" alt="Hero HUD v Xtraction: preflop, steal a postflop statistiky z 351 hand" width="1800" height="1477">
+      </div>
+      <div class="float f1">
+        <div class="k">Soupeř · designroyal36</div>
+        <div class="hudrow" style="margin-top:6px">
+          <div><span class="k">VPIP</span><span class="v g">27</span></div>
+          <div><span class="k">PFR</span><span class="v g">17</span></div>
+          <div><span class="k">AF</span><span class="v r">5.5</span></div>
+        </div>
+      </div>
+      <div class="float f2">
+        <div class="k">Turnaj · Net won</div>
+        <div class="v g" style="margin-top:4px">+879 042</div>
+        <div class="k" style="margin-top:2px">Win rate 42.9 %</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rooms">
+  <div class="wrap">
+    <p>Podporované herny</p>
+    <div class="room">Fortuna <small>XML import</small></div>
+    <div class="room">Synottip <small>Import + živý HUD</small></div>
+  </div>
+</div>
+
+<section id="funkce">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Funkce</span>
+      <h2>Všechno, co potřebuješ k lepší hře. Nic navíc.</h2>
+      <p class="lead">Žádné ruční přepisování a žádné tabulky. Nahraješ historii a hned vidíš, kde vyděláváš a kde ztrácíš.</p>
+    </div>
+
+    <div class="bento">
+      <div class="card c-4 rv">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg></div>
+        <h3>Hero HUD se 60+ statistikami</h3>
+        <p>Preflop, steal a obrana blindů, c-bety na každé street, showdown i agrese. U každého čísla vidíš počet akcí a příležitostí, takže víš, kterému vzorku věřit.</p>
+        <div class="statlist">
+          <div><div class="k">VPIP</div><div class="v b">17.1%</div></div>
+          <div><div class="k">PFR</div><div class="v b">11.1%</div></div>
+          <div><div class="k">3Bet</div><div class="v b">6.5%</div></div>
+          <div><div class="k">Flop CBet</div><div class="v g">40.0%</div></div>
+          <div><div class="k">Fold to steal</div><div class="v r">87.5%</div></div>
+          <div><div class="k">WTSD</div><div class="v g">29.4%</div></div>
+        </div>
+      </div>
+
+      <div class="card c-2 rv">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <h3>Živý HUD</h3>
+        <p>Synottip Companion pro Chrome promítne statistiky soupeřů přímo ke stolu, zatímco hraješ.</p>
+      </div>
+
+      <div class="card c-3 rv">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg></div>
+        <h3>Grafy a EV</h3>
+        <p>Výhry, EV vs. Net Won, vývoj žetonů, výsledky podle pozice a street.</p>
+        <svg class="chart" viewBox="0 0 400 130" preserveAspectRatio="none">
+          <path class="ev" d="M0 110 C60 100 90 92 140 80 S230 60 280 52 S360 30 400 22"/>
+          <path class="line" d="M0 112 L30 104 L55 108 L80 92 L110 96 L140 78 L165 84 L190 66 L220 72 L245 50 L270 58 L300 40 L330 46 L360 26 L400 18"/>
+        </svg>
+      </div>
+
+      <div class="card c-3 rv">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 4 20 12 6 20 6 4"/></svg></div>
+        <h3>Replayer hand</h3>
+        <p>Přehraj si každou handu akci po akci a doplň k ní poznámku pro pozdější review.</p>
+        <div class="cards-row"><div class="pc">A♠</div><div class="pc red">K♥</div><div class="pc back"></div><div class="pc red">Q♦</div><div class="pc">J♣</div></div>
+        <div class="timeline"><span>Preflop</span><span class="on">Flop</span><span>Turn</span><span>River</span></div>
+      </div>
+
+      <div class="card c-2 rv">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M17 11a3 3 0 1 0 0-6M22 21c0-3-1.5-5-4-5.6"/></svg></div>
+        <h3>Profily soupeřů</h3>
+        <p>VPIP, PFR, 3bet, CBet, AF a výsledek každého hráče, se kterým jsi seděl.</p>
+      </div>
+
+      <div class="card c-2 rv">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg></div>
+        <h3>Data zůstávají u tebe</h3>
+        <p>Handy se zpracují lokálně v aplikaci. Na server jde jen přihlášení a licence.</p>
+      </div>
+
+      <div class="card c-2 rv">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
+        <h3>Automatické aktualizace</h3>
+        <p>Nové verze se stáhnou samy. Vždycky máš poslední opravy a statistiky.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="hud" style="padding-top:40px">
+  <div class="wrap showcase">
+    <div class="rv">
+      <span class="eyebrow">Analýza</span>
+      <h2 style="margin-top:16px">Uvidíš svoje leaky dřív než soupeři</h2>
+      <p class="lead" style="margin-top:16px">Barvy statistik ukážou na první pohled, co je v normě a co ne. Turnaje si rozklikneš až na jednotlivé hráče u stolu.</p>
+      <ul class="checks">
+        <li><svg><use href="#check"/></svg><span><b>Akce / příležitosti</b> u každé statistiky, žádná čísla z pěti hand.</span></li>
+        <li><svg><use href="#check"/></svg><span><b>Pozice proti pozici</b> — 3bet BTN vs CO, fold BB vs BTN steal a další.</span></li>
+        <li><svg><use href="#check"/></svg><span><b>Turnaje i cash</b> s filtrem podle herny a typu hry.</span></li>
+      </ul>
+    </div>
+    <div class="rv">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-img="assets/hero-hud.jpg" data-t="Hero HUD">Hero HUD</button>
+        <button role="tab" aria-selected="false" data-img="assets/players.jpg" data-t="Grafy · Hráči">Hráči u stolu</button>
+      </div>
+      <div class="window">
+        <div class="titlebar"><i></i><i></i><i></i><span id="tabTitle">Hero HUD</span></div>
+        <img id="tabImg" src="assets/hero-hud.jpg" alt="Ukázka obrazovky Xtraction" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:40px">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Jak začít</span>
+      <h2>Od stažení k první statistice za pár minut</h2>
+    </div>
+    <div class="steps">
+      <div class="step rv"><h3>Nainstaluj aplikaci</h3><p>Stáhni instalačku pro Windows nebo Mac a spusť ji. Žádné nastavování databáze.</p></div>
+      <div class="step rv"><h3>Vytvoř si účet</h3><p>Při prvním spuštění se zaregistruješ nebo přihlásíš. Účet drží tvoji licenci.</p></div>
+      <div class="step rv"><h3>Nahraj handy</h3><p>V Importu vyber Fortunu nebo Synottip a přetáhni historii. Statistiky jsou hned připravené.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="dl" id="stahnout">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Stáhnout</span>
+      <h2>Xtraction pro tvůj počítač</h2>
+      <p class="lead">Verze 1.0.4 · vydáno 30. 10. 2026</p>
+    </div>
+    <div class="platforms">
+      <div class="plat rv" id="plat-win">
+        <div class="plat-top"><svg><use href="#win"/></svg><span class="tag">Tvůj systém</span></div>
+        <div><h3>Windows</h3><p class="req">Windows 10 nebo 11, 64bit</p></div>
+        <a class="btn btn-primary btn-lg" data-dl="win" href="https://github.com/XtractionCo/xtractionco.github.io/releases/download/v1.0.4/PokerXtract-Setup-1.0.4.exe"><svg><use href="#dl"/></svg>Stáhnout pro Windows</a>
+        <dl><dt>Soubor</dt><dd>PokerXtract-Setup-1.0.4.exe</dd><dt>Velikost</dt><dd>118 MB</dd></dl>
+        <button class="hash" data-hash="7f681d21c331972fc4ed433c20353dd6fef67607624114efe7bc4fe7b234f63a" title="Zkopírovat SHA-256"><span>SHA-256</span><code>7f681d21…7b234f63a</code><svg><use href="#copy"/></svg></button>
+        <p class="note">Pokud Windows zobrazí „Systém Windows ochránil počítač“, klikni na <b>Další informace → Přesto spustit</b>.</p>
+      </div>
+      <div class="plat rv" id="plat-mac">
+        <div class="plat-top"><svg><use href="#apple"/></svg><span class="tag">Tvůj systém</span></div>
+        <div><h3>macOS</h3><p class="req">Apple Silicon (M1 a novější)</p></div>
+        <a class="btn btn-primary btn-lg" data-dl="mac" href="https://github.com/XtractionCo/xtractionco.github.io/releases/download/v1.0.4/PokerXtract-1.0.4-mac-arm64.dmg"><svg><use href="#dl"/></svg>Stáhnout pro Mac</a>
+        <dl><dt>Soubor</dt><dd>PokerXtract-1.0.4-mac-arm64.dmg</dd><dt>Velikost</dt><dd>466 MB</dd></dl>
+        <button class="hash" data-hash="fcc5c969e9f31690e5a40e594f15de7a5ff0145be4b2f0b2808a33b15ad2f86f" title="Zkopírovat SHA-256"><span>SHA-256</span><code>fcc5c969…3a5b2e</code><svg><use href="#copy"/></svg></button>
+        <p class="note">Otevři DMG a přetáhni aplikaci do <b>Aplikací</b>. Při prvním spuštění klikni pravým tlačítkem → <b>Otevřít</b>.</p>
+      </div>
+    </div>
+    <p class="dl-foot rv">Mac s procesorem Intel zatím nepodporujeme. Starší verze najdeš na <a href="https://github.com/XtractionCo/xtractionco.github.io/releases">GitHubu</a>.</p>
+  </div>
+</section>
+
+<section id="cenik">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow">Ceník</span>
+      <h2>Začni zdarma, přejdi na PRO, až budeš chtít víc</h2>
+    </div>
+    <div class="prices">
+      <div class="price rv">
+        <h3>Free</h3>
+        <p class="amt">Zdarma navždy</p>
+        <ul>
+          <li><svg><use href="#check"/></svg>Import z Fortuny a Synottipu</li>
+          <li><svg><use href="#check"/></svg>Dashboard, seznam hand a sessions</li>
+          <li><svg><use href="#check"/></svg>Replayer hand</li>
+          <li><svg><use href="#check"/></svg>Základní grafy</li>
+        </ul>
+        <a href="#stahnout" class="btn btn-ghost">Stáhnout zdarma</a>
+      </div>
+      <div class="price pro rv">
+        <h3>PRO <span>Doporučeno</span></h3>
+        <p class="amt">Měsíční předplatné, kdykoli zrušitelné</p>
+        <ul>
+          <li><svg><use href="#check"/></svg>Všechno z Free</li>
+          <li><svg><use href="#check"/></svg>Hero HUD a živý HUD u stolu</li>
+          <li><svg><use href="#check"/></svg>Pokročilé review a poznámky k handám</li>
+          <li><svg><use href="#check"/></svg>Srovnání s populací hráčů</li>
+        </ul>
+        <a href="#stahnout" class="btn btn-primary">Vyzkoušet PRO</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:40px">
+  <div class="wrap">
+    <div class="sec-head rv"><span class="eyebrow">FAQ</span><h2>Časté otázky</h2></div>
+    <div class="faq rv">
+      <details><summary>Které herny Xtraction podporuje?</summary><p>Fortunu (iPoker XML) a Synottip. Synottip navíc podporuje živý HUD přes rozšíření Synottip Companion pro Chrome, které si stáhneš přímo z aplikace.</p></details>
+      <details><summary>Kam se ukládají moje handy?</summary><p>Handy zpracovává aplikace na tvém počítači. Přes internet se ověřuje jen přihlášení a licence. Instalačka neobsahuje žádná cizí data.</p></details>
+      <details><summary>Proč Windows nebo macOS zobrazuje varování?</summary><p>Instalačky zatím nejsou podepsané komerčním certifikátem. Pravost souboru si můžeš ověřit podle kontrolního součtu SHA-256 u tlačítka ke stažení.</p></details>
+      <details><summary>Potřebuju k aplikaci internet?</summary><p>Ano, pro přihlášení a obnovu licence. Při prvním spuštění může odpověď serveru chvíli trvat.</p></details>
+      <details><summary>Jak se aplikace aktualizuje?</summary><p>Automaticky. Po spuštění zkontroluje novou verzi a stáhne ji. Aktuální verzi vidíš v horní liště aplikace.</p></details>
+      <details><summary>Je hraní s HUDem povolené?</summary><p>Pravidla používání trackerů a HUDů určuje každá herna. Před použitím živého HUDu si zkontroluj podmínky své herny.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <div class="wrap rv">
+    <h2>Hraj s daty, ne s pocitem</h2>
+    <p class="lead">Stáhni Xtraction a za pár minut uvidíš svoje první statistiky.</p>
+    <a href="#stahnout" class="btn btn-primary btn-lg" id="finalBtn"><svg><use href="#dl"/></svg><span>Stáhnout zdarma</span></a>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a href="#" class="logo" style="font-size:15px;color:var(--muted)"><svg style="width:20px;height:20px"><use href="#logo"/></svg>Xtraction</a>
+    <nav><a href="#funkce">Funkce</a><a href="#stahnout">Stáhnout</a><a href="#cenik">Ceník</a><a href="#faq">FAQ</a></nav>
+    <span>© 2026 Xtraction · 18+ · Hraj zodpovědně</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast">SHA-256 zkopírován</div>
+
+<script>
+(function(){
+  var nav=document.getElementById('nav');
+  var onScroll=function(){nav.classList.toggle('scrolled',scrollY>12);document.getElementById('heroWindow').classList.toggle('flat',scrollY>120)};
+  addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  // OS detection → primary download
+  var ua=navigator.userAgent, os=/Mac|iPhone|iPad/.test(ua)?'mac':/Win/.test(ua)?'win':null;
+  if(os){
+    var link=document.querySelector('[data-dl="'+os+'"]');
+    document.getElementById('plat-'+os).classList.add('detected');
+    ['heroBtn','finalBtn'].forEach(function(id){
+      var b=document.getElementById(id);
+      b.href=link.href;
+      b.querySelector('span').textContent=os==='mac'?'Stáhnout pro Mac':'Stáhnout pro Windows';
+    });
+    document.getElementById('heroMeta').innerHTML='v1.0.4 · '+(os==='mac'?'Apple Silicon · 466 MB':'Windows 10/11 · 118 MB')+' · <a href="#stahnout">Jiné platformy</a>';
+  }
+
+  // reveal on scroll
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.rv').forEach(function(el,i){el.style.transitionDelay=(i%4)*60+'ms';io.observe(el)});
+
+  // screenshot tabs
+  var img=document.getElementById('tabImg'),title=document.getElementById('tabTitle');
+  document.querySelectorAll('.tabs button').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.tabs button').forEach(function(b){b.setAttribute('aria-selected',b===btn)});
+      img.style.opacity=0;
+      setTimeout(function(){img.src=btn.dataset.img;title.textContent=btn.dataset.t;img.onload=function(){img.style.opacity=1}},200);
+    });
+  });
+
+  // copy hash
+  var toast=document.getElementById('toast'),t;
+  document.querySelectorAll('.hash').forEach(function(h){
+    h.addEventListener('click',function(){
+      try{navigator.clipboard.writeText(h.dataset.hash)}catch(e){}
+      toast.classList.add('show');clearTimeout(t);t=setTimeout(function(){toast.classList.remove('show')},1600);
+    });
+  });
+})();
+</script>
+</body>
+</html>
